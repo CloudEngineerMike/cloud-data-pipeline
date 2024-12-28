@@ -1,4 +1,4 @@
-# Query Questor
+# Blob Questor
 
 Azure native query function app. Outputs a blob file of all Azure data within the tenant.
 
