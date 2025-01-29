@@ -6,10 +6,10 @@ Azure native query function app. Outputs a blob file of all Azure data within th
 <a href="https://www.vecteezy.com/free-vector/blobfish">Blobfish Vectors by Vecteezy</a>
 
 ## The Problem
-Ever wanted to track analytics for all the resources in your Azure tenant? Say goodbye to guesswork and outdated inventory spreadsheets. Let Query Quest, query your entire tenant and provide detailed insights at your fingertips.
+Ever wanted to track analytics for all the resources in your Azure tenant? Say goodbye to guesswork and outdated inventory spreadsheets. Let Blob Questor, query your entire tenant and provide detailed insights at your fingertips.
 
 ## The Solution
-Query Quest is a service that provides an automated mechanism for querying all of Azure's data and pulling the JSON into a blob file. **Bonus**: Query Quest can now transport data between cloud platforms! Keep all your data in one place has never been easier.
+Blob Questor is a service that provides an automated mechanism for querying all of Azure's data and pulling the JSON into a blob file. **Bonus**: Blob Questor can now transport data between cloud platforms! Keep all your data in one place has never been easier.
 
 ## Architecture
 
