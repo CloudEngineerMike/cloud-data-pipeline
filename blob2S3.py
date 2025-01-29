@@ -1,143 +1,75 @@
-import boto3
-
+import os
+import json
 import base64
-
-from azure.storage.blob import BlockBlobService, ContainerPermissions
-
-from datetime import datetime, timedelta
-
+import boto3
+from datetime import datetime
+from azure.storage.blob import BlockBlobService
 from botocore.exceptions import ClientError
 
-import json
-
-import os
-
- 
 
 def myconverter(o):
-
+    """Converts datetime objects to string format."""
     if isinstance(o, datetime):
-
         return o.__str__()
 
- 
 
 def lambda_handler(event, context):
+    """AWS Lambda handler function."""
+    secret_name = "SECRET-NAME"
+    region_name = "REGION"
 
-    secret_name = "Blobfish"
+    bucket_name = (
+        "S3-BUCKET"
+        if os.environ.get("ENVIRONMENT", "") == "prod"
+        else "S3-BUCKET-dev"
+    )
 
-    region_name = "us-east-1"
+    # Create AWS Secrets Manager client
+    secrets_manager = boto3.client("secretsmanager", region_name=region_name)
 
-    if os.environ.get('ENVIRONMENT', "") == "prod":
+    # Create AWS S3 client
+    s3 = boto3.client("s3", region_name=region_name)
 
-        bucket_name = "naapi-ingestion-data"
+    # Retrieve secret from AWS Secrets Manager
+    get_secret_value_response = secrets_manager.get_secret_value(SecretId=secret_name)
 
+    # Extract secret key
+    if "SecretString" in get_secret_value_response:
+        key = json.loads(get_secret_value_response["SecretString"])["account_key"]
     else:
+        decoded_binary_secret = base64.b64decode(get_secret_value_response["SecretBinary"])
+        key = decoded_binary_secret.decode("utf-8")
 
-        bucket_name = "naapi-ingestion-data-dev"
+    # Initialize Azure Blob Storage client
+    blob_service = BlockBlobService(account_name="STORAGE-ACCOUNT", account_key=key)
+    container = "STORAGE-CONTAINER"
+    blob_name = "DATA.json"
+    local_blob_path = "/tmp/QUERY-DATA.json"
 
- 
+    # Download blob from Azure
+    blob_service.get_blob_to_path(container, blob_name, local_blob_path)
 
-    # Create a Secrets Manager client
-
-    secrets_manager = boto3.client(
-
-        service_name= 'secretsmanager',
-
-        region_name= region_name
-
-    )
-
- 
-
-    s3 = boto3.client(
-
-        service_name= 's3',
-
-        region_name= region_name
-
-    )
-
- 
-
-    get_secret_value_response = secrets_manager.get_secret_value(
-
-        SecretId = secret_name
-
-    )
-
- 
-
-    # Decrypts secret using the associated KMS CMK.
-
-    # Depending on whether the secret is a string or binary, one of these fields will be populated.
-
-    # print(json.dumps(get_secret_value_response, default=myconverter))
-
-    if 'SecretString' in get_secret_value_response:
-
-        key = json.loads(get_secret_value_response['SecretString'])['account_key']
-
-    else:
-
-        decoded_binary_secret = base64.b64decode(get_secret_value_response['SecretBinary'])
-
- 
-
-    blob_service = BlockBlobService(account_name = 'resourcegraphstorage', account_key = key)
-
-    container = 'resourcegraphcontainer'
-
-    blob_name = 'SavedFileJSON.json'
-
- 
-
-    blob_service.get_blob_to_path(container, blob_name, '/tmp/' + 'azureResourceGraphDataRaw.json')
-
- 
-
-    with open("/tmp/azureResourceGraphDataRaw.json", 'r') as jsonFile:
-
-        data = json.load(jsonFile)
-
-  
+    # Load JSON file
+    with open(local_blob_path, "r") as json_file:
+        data = json.load(json_file)
 
     def recursion(obj):
+        """Recursively processes JSON data, replacing empty strings with None."""
+        if isinstance(obj, (str, int)):
+            return obj
+        if isinstance(obj, list):
+            return [recursion(item) for item in obj]
+        if isinstance(obj, dict):
+            return {key: recursion(value) if isinstance(value, (dict, list)) else (None if value == "" else value) for key, value in obj.items()}
+        return obj
 
-        if type(obj) is str or type(obj) is int:
+    # Process the JSON data
+    processed_data = recursion(data)
 
-            return(obj)
+    # Save processed JSON data
+    processed_json_path = "/tmp/RESOURCE-GRAPH-DATA.json"
+    with open(processed_json_path, "w") as file:
+        json.dump(processed_data, file, sort_keys=True, indent=2)
 
-        if type(obj) is list:
-
-            for i, item in enumerate(obj):
-
-                obj[i] = recursion(item)
-
-        if type(obj) is dict:
-
-            for key in obj:
-
-                if type(obj[key]) is dict or type(obj[key]) is list:
-
-                    obj[key] = recursion(obj[key])
-
-                elif obj[key] == "":
-
-                    obj[key] = None
-
-        return(obj)
-
- 
-
-    d = recursion(data)
-
- 
-
-    with open('/tmp/' + 'azureResourceGraphData.json', 'w') as file:
-
-        json.dump(d, file, sort_keys=True, indent=2)
-
- 
-
-    s3.upload_file('/tmp/' + 'azureResourceGraphData.json', bucket_name, 'azure/graph/' + 'azureResourceGraphData.json')
+    # Upload processed JSON to S3
+    s3.upload_file(processed_json_path, bucket_name, "azure/graph/RESOURCE-GRAPH-DATA.json")
