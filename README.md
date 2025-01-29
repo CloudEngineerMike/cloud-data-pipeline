@@ -37,8 +37,9 @@ Blob Questor integrates **Azure & AWS services** to fetch, store, and transfer y
 ✅ **S3 Buckets** – Stores Blob files for easy access  
 
 ### 💻 **Languages**  
-✅ **PowerShell**
-✅ 🐍 **Python**
+- **PowerShell**
+- **Python**
+
 ---
 
 ## 🔄 How It Works  
