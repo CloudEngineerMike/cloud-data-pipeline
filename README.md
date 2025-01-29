@@ -1,36 +1,70 @@
-# Blob Questor
+# 🟡 Blob Questor  
 
-Azure native query function app. Outputs a blob file of all Azure data within the tenant.
+🚀 **Seamlessly Query & Transport Your Azure Data** 🚀  
 
-![vecteezy_ugly-blobfish-logo-design_8214047](https://github.com/user-attachments/assets/d3afe596-905c-4668-830f-a83a0e01a83e)
-<a href="https://www.vecteezy.com/free-vector/blobfish">Blobfish Vectors by Vecteezy</a>
+Blob Questor is an Azure-native **query function app** designed to **fetch, aggregate, and store** all Azure data across your tenant into a structured **Blob file**—ready for analytics, compliance, and cross-cloud portability!  
 
-## The Problem
-Ever wanted to track analytics for all the resources in your Azure tenant? Say goodbye to guesswork and outdated inventory spreadsheets. Let Blob Questor, query your entire tenant and provide detailed insights at your fingertips.
+![Blob Questor Logo](https://github.com/user-attachments/assets/d3afe596-905c-4668-830f-a83a0e01a83e)  
+<sub><a href="https://www.vecteezy.com/free-vector/blobfish">Blobfish Vectors by Vecteezy</a></sub>  
 
-## The Solution
-Blob Questor is a service that provides an automated mechanism for querying all of Azure's data and pulling the JSON into a blob file. **Bonus**: Blob Questor can now transport data between cloud platforms! Keep all your data in one place has never been easier.
+---
 
-## Architecture
+## 💡 The Problem  
+Struggling to track **all** your Azure resources? Still relying on **outdated spreadsheets** for inventory and analytics? Managing cross-cloud data can be a nightmare without automation.  
 
-![image003](https://github.com/user-attachments/assets/ec53a710-f557-42aa-b727-42c6708553f1)
+### 🔥 Enter **Blob Questor**  
+Blob Questor takes the hassle out of tracking **your entire Azure environment** by **automating** data collection and storing it in a Blob file—**no manual effort required!**  
 
-#### Azure
+💾 **Bonus Feature:** It’s **cloud-agnostic**! Blob Questor seamlessly transports your data between **Azure & AWS**, keeping your insights centralized across platforms.  
 
-1. Function Web App
-1. Blob Service
+---
 
-#### AWS
+## 🏗️ Architecture  
 
-1. CloudWatch Events
-1. Secrets Manager
-1. Lambda
-1. S3
+Blob Questor integrates **Azure & AWS services** to fetch, store, and transfer your data securely.  
 
-## Order of Operations
+![Blob Questor Architecture](https://github.com/user-attachments/assets/ec53a710-f557-42aa-b727-42c6708553f1)  
 
-1. The Function Web App, is scheduled to run at the top of every hour. In it contains a PowerShell script that queries all of Azure's data, saving the results to a Blob file
-1. CloudWatch Events schedules Lambda to run the script, twice a day
-1. Lambda then authenticates with Secrets Manager to retrieve the Azure Account Key
-1. With the Account Key, Lambda is then permitted to access the storage container in Azure (which contains the Blob)
-1. During each invocation, Lambda temporarily saves the Blob file into its /tmp directory, followed by an immediate upload to S3. Placing the Blob within an S3 Bucket
+### 🏢 **Azure Components**  
+✅ **Function Web App** – Powers the scheduled query execution  
+✅ **Blob Storage Service** – Stores the extracted JSON data  
+
+### ☁️ **AWS Components**  
+✅ **CloudWatch Events** – Triggers automated executions  
+✅ **Secrets Manager** – Securely stores Azure credentials  
+✅ **Lambda Functions** – Facilitates data retrieval & transfer  
+✅ **S3 Buckets** – Stores Blob files for easy access  
+
+---
+
+## 🔄 How It Works  
+
+Blob Questor runs on a **set schedule** to pull data from Azure and transport it securely to AWS:  
+
+1️⃣ **Azure Function App** runs **hourly**, executing a PowerShell script that queries Azure's resources and saves the results in a Blob file.  
+2️⃣ **CloudWatch Events** triggers an AWS Lambda function **twice a day** to initiate data transfer.  
+3️⃣ **Lambda** authenticates with **Secrets Manager** to retrieve the Azure Storage Account Key.  
+4️⃣ Using the retrieved key, **Lambda gains access** to the Azure Blob storage container.  
+5️⃣ **Lambda temporarily stores** the Blob file in **/tmp**, then **uploads it to S3**—securing it for further processing.  
+
+💡 **Why It’s Awesome**  
+✔ **Fully Automated** – No manual intervention needed  
+✔ **Multi-Cloud Ready** – Works across Azure & AWS  
+✔ **Secure & Scalable** – Uses encrypted credentials and cloud-native services  
+
+---
+
+## 🚀 Get Started  
+
+🔹 **Step 1:** Clone the repo  
+🔹 **Step 2:** Configure your Azure & AWS credentials  
+🔹 **Step 3:** Deploy the function and schedule your queries  
+🔹 **Step 4:** Let Blob Questor do the work!  
+
+---
+
+## 📌 Conclusion  
+
+With **Blob Questor**, managing **large-scale Azure data** has never been easier. Say goodbye to **manual queries** and **scattered cloud data**—and hello to **automated insights** at your fingertips!  
+
+🟡 **Try it today & simplify your cloud data management!** 🚀  
