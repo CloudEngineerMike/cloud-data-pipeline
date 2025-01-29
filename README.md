@@ -26,8 +26,9 @@ Blob Questor integrates **Azure & AWS services** to fetch, store, and transfer y
 ![Blob Questor Architecture](https://github.com/user-attachments/assets/ec53a710-f557-42aa-b727-42c6708553f1)  
 
 ### 🏢 **Azure Components**  
-✅ **Function Web App** – Powers the scheduled query execution  
+✅ **Azure Function App** – Powers the scheduled query execution  
 ✅ **Blob Storage Service** – Stores the extracted JSON data  
+✅ **Resource Graph** – Queries Big Data from Tenant
 
 ### ☁️ **AWS Components**  
 ✅ **CloudWatch Events** – Triggers automated executions  
@@ -35,6 +36,9 @@ Blob Questor integrates **Azure & AWS services** to fetch, store, and transfer y
 ✅ **Lambda Functions** – Facilitates data retrieval & transfer  
 ✅ **S3 Buckets** – Stores Blob files for easy access  
 
+### 💻 **Languages**  
+✅ **PowerShell**
+✅ 🐍 **Python**
 ---
 
 ## 🔄 How It Works  
