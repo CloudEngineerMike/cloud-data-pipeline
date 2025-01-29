@@ -1,106 +1,68 @@
 # Input bindings are passed in via param block.
-
 param($Timer)
 
- 
-
 # Get the current universal time in the default string format
-
 $currentUTCtime = (Get-Date).ToUniversalTime()
 
- 
-
-# The 'IsPastDue' porperty is 'true' when the current function invocation is later than scheduled.
-
+# Check if the timer is past due
 if ($Timer.IsPastDue) {
-
     Write-Host "PowerShell timer is running late!"
-
 }
 
- 
-
-# Write an information log with the current time.
-
+# Log the execution time
 Write-Host "PowerShell timer trigger function ran! TIME: $currentUTCtime"
 
- 
+# Authenticate to Azure using managed identity
+Connect-AzAccount -IdentityNAME
 
-Connect-AzAccount -Identity
-
- 
-
+# Set Azure subscription context
 Set-AzContext -SubscriptionId "<enter-string>"
 
- 
-
+# Define the page size for querying Azure Resource Graph
 $pageSize = 700
 
-
-#iteration count initialized to 0
-
+# Initialize iteration count
 $iteration = 0
 
+# Define search parameters
 $searchParams = @{
-
-    #update query as needed
-
-    Query = ""
-
+    Query = ""     # Update query as needed
     First = $pageSize
-
 }
 
-
-#loop until all records are queried
-
+# Query loop to fetch all records
 $results = do {
-
     $iteration += 1
-
     Write-Verbose "Iteration #$iteration" -Verbose
 
-    #query Azure Graph
-
+    # Execute the Azure Resource Graph query
     $pageResults = Search-AzGraph @searchParams
 
+    # Update skip parameter for pagination
     $searchParams.Skip += $pageResults.Count
 
+    # Output results
     $pageResults
-
-    #Out-File -FilePath .\test_$iteration.txt -InputObject $pageResults -Encoding ASCII -Width 200
 
 } while ($pageResults.Count -eq $pageSize)
 
- 
-
+# Convert results to JSON format
 $json_results = $results | ConvertTo-Json -Depth 100
 
- 
+# Define output file name
+$fileName = "JSON.json"
 
-$fileName = "SavedFileJSON.json"
-
-
+# Save JSON results to a file
 Out-File -FilePath $fileName -InputObject $json_results -Encoding UTF8NoBOM
 
- 
+# Normalize line endings in the JSON file
+(Get-Content $fileName -Raw).Replace("`r`n", "`n") | Set-Content $fileName -Force
 
-(Get-Content $fileName -Raw).Replace("`r`n","`n") | Set-Content $fileName -Force
+# Retrieve storage account key
+$acctKey = (Get-AzStorageAccountKey -Name 'STORAGE-ACCOUNT' -ResourceGroupName 'RG-NAME').Value[0]
 
- 
+# Create storage context for blob upload
+$storageContext = New-AzStorageContext -StorageAccountName "STORAGE-ACCOUNT" -StorageAccountKey $acctKey
 
-#Get key to storage account
-
-$acctKey = (Get-AzStorageAccountKey -Name 'resourcegraphstorage' -ResourceGroupName resourcegraph).Value[0]
-
- 
-
-#Map to the reports BLOB context
-
-$storageContext = New-AzStorageContext -StorageAccountName "resourcegraphstorage" -StorageAccountKey $acctKey
-
- 
-
-#Copy the file to the storage account
-
-Set-AzStorageBlobContent -File $fileName -Container "resourcegraphcontainer" -BlobType "Block" -Context $storageContext -Verbose -Force
+# Upload the JSON file to Azure Storage Blob
+Set-AzStorageBlobContent -File $fileName -Container "RG-CONTAINER" -BlobType "Block" -Context $storageContext -Verbose -Force
