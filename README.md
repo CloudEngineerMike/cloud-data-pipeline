@@ -7,7 +7,7 @@ Blob Questor is an Azure-native **query function app** designed to **fetch, aggr
 ![Blob Questor Logo](https://github.com/user-attachments/assets/d3afe596-905c-4668-830f-a83a0e01a83e)  
 <sub><a href="https://www.vecteezy.com/free-vector/blobfish">Blobfish Vectors by Vecteezy</a></sub>  
 
----
+
 
 ## 💡 The Problem  
 Struggling to track **all** your Azure resources? Still relying on **outdated spreadsheets** for inventory and analytics? Managing cross-cloud data can be a nightmare without automation.  
@@ -17,7 +17,7 @@ Blob Questor takes the hassle out of tracking **your entire Azure environment** 
 
 💾 **Bonus Feature:** It’s **cloud-agnostic**! Blob Questor seamlessly transports your data between **Azure & AWS**, keeping your insights centralized across platforms.  
 
----
+
 
 ## 🏗️ Architecture  
 
