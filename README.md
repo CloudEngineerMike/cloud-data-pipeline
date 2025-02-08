@@ -4,7 +4,7 @@
 
 Blob Questor is an Azure-native **query function app** designed to **fetch, aggregate, and store** all Azure data across your tenant into a structured **Blob file**—ready for analytics, compliance, and cross-cloud portability!  
 
-![Blob Questor Logo](https://github.com/user-attachments/assets/d3afe596-905c-4668-830f-a83a0e01a83e)  
+![Image](https://github.com/user-attachments/assets/46e7e7e0-099c-4402-877b-b2598f87a47b)  
 <sub><a href="https://www.vecteezy.com/free-vector/blobfish">Blobfish Vectors by Vecteezy</a></sub>  
 
 
