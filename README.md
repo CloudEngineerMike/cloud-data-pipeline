@@ -23,7 +23,7 @@ Blob Questor takes the hassle out of tracking **your entire Azure environment** 
 
 Blob Questor integrates **Azure & AWS services** to fetch, store, and transfer your data securely.  
 
-![Blob Questor Architecture](https://github.com/user-attachments/assets/ec53a710-f557-42aa-b727-42c6708553f1)  
+![Image](https://github.com/user-attachments/assets/dbfea1fb-2791-4ed5-989c-a17bcd84d415)
 
 ### 🏢 **Azure Components**  
 ✅ **Azure Function App** – Powers the scheduled query execution  
