@@ -1,75 +1,95 @@
-# Blob Questor  
+# Azure to AWS Data Pipeline
+_Automated pipeline for querying Azure data, storing it in AWS, and making it available via API._
 
-**Seamlessly Query & Transport Your Azure Data** 🚀  
-
-Blob Questor is an Azure-native **query function app** designed to **fetch, aggregate, and store** all Azure data across your tenant into a structured **Blob file**—ready for analytics, compliance, and cross-cloud portability!  
-
-![Image](https://github.com/user-attachments/assets/46e7e7e0-099c-4402-877b-b2598f87a47b)  
+![Image](./assets/blob.svg)
 <sub><a href="https://www.vecteezy.com/free-vector/blobfish">Blobfish Vectors by Vecteezy</a></sub>  
 
+## Overview
+This pipeline utilizes **Azure Resource Graph** to query Azure data, stores the results in an **Azure Blob Storage** container, and transfers the data to AWS. AWS Lambda functions process the data, store it in **Amazon S3**, and persist it into **DynamoDB** for API consumption.
+
+## 📌 Diagram
+![Azure to AWS Data Pipeline](./assets//cloud-data-pipeline-diagram.png)
+
+## Workflow
+1. **Azure Functions**:
+   - Runs on a **daily CRON schedule** to execute **Azure Resource Graph queries**.
+   - Stores the queried data into an **Azure Blob Storage** container.
+   - Uses **Application Insights** for monitoring and logging.
+2. **AWS Lambda (Data Fetcher)**:
+   - Retrieves the blob file from **Azure Blob Storage**.
+   - Stores the data into an **Amazon S3 bucket**.
+3. **AWS Lambda (Data Processor)**:
+   - Reads the stored data from **Amazon S3**.
+   - Inserts the structured data into **Amazon DynamoDB**.
+4. **Amazon API Gateway**:
+   - Provides a RESTful API to consume the data from **DynamoDB**.
+   
+## AWS & Azure Services Used
+### **Azure Services**
+- **Azure Functions** → Automates Azure Resource Graph queries.
+- **Azure Resource Graph** → Queries all Azure subscriptions.
+- **Azure Blob Storage** → Stores the query results.
+- **Application Insights** → Logs and monitors function execution.
+
+### **AWS Services**
+- **AWS Lambda** → Handles data extraction, transformation, and storage.
+- **Amazon S3** → Stores intermediate data.
+- **Amazon DynamoDB** → NoSQL database to persist query results.
+- **Amazon API Gateway** → Exposes DynamoDB data as an API.
+
+## 🔧 Setup & Deployment
+### 1️. Prerequisites
+- Azure and AWS accounts with required IAM permissions.
+- AWS CLI and Azure CLI installed and configured.
+- Node.js or Python installed for Lambda development.
+
+### 2. Clone the Repository
+```sh
+git clone https://github.com/<your-org>/<your-repo>
+cd <your-repo>
+```
+
+### 3. Deploy Azure Function
+#### Install dependencies:
+```sh
+npm install
+```
+
+#### Deploy using Azure Functions Core Tools:
+```sh
+func azure functionapp publish <your-function-app>
+```
+
+### 4. Deploy AWS Lambda Functions
+#### Using AWS SAM:
+```sh
+sam build && sam deploy --guided
+```
+OR
+#### Using AWS CDK:
+```sh
+cdk deploy
+```
+
+### 5. API Consumption
+Once the pipeline is deployed, you can retrieve data via API Gateway:
+```sh
+curl -X GET https://<api-gateway-url>/data
+```
+
+## 🚀 Execution Stages
+| Stage | Service | Description |
+|-------|---------|-------------|
+| **Query Azure** | Azure Functions | Runs Azure Resource Graph queries and stores data in Blob Storage. |
+| **Extract & Store** | AWS Lambda | Retrieves the Blob file and uploads it to S3. |
+| **Process & Persist** | AWS Lambda | Reads from S3 and inserts structured data into DynamoDB. |
+| **API Access** | API Gateway | Exposes data from DynamoDB via a REST API. |
 
 
-## The Problem  
-Struggling to track **all** your Azure resources? Still relying on **outdated spreadsheets** for inventory and analytics? Managing cross-cloud data can be a nightmare without automation.  
+## 📖 Resources
+- [Azure Resource Graph Documentation](https://learn.microsoft.com/en-us/azure/governance/resource-graph/)
+- [Azure Functions Documentation](https://learn.microsoft.com/en-us/azure/azure-functions/)
+- [AWS Lambda Documentation](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html)
+- [Amazon DynamoDB Documentation](https://docs.aws.amazon.com/dynamodb/latest/developerguide/)
+- [Amazon API Gateway Documentation](https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html)
 
-### Enter **Blob Questor**  
-Blob Questor takes the hassle out of tracking **your entire Azure environment** by **automating** data collection and storing it in a Blob file—**no manual effort required!**  
-
-**Bonus Feature:** It’s **cloud-agnostic**! Blob Questor seamlessly transports your data between **Azure & AWS**, keeping your insights centralized across platforms.  
-
-
-
-## Architecture  
-
-Blob Questor integrates **Azure & AWS services** to fetch, store, and transfer your data securely.  
-
-![Image](https://github.com/user-attachments/assets/dbfea1fb-2791-4ed5-989c-a17bcd84d415)
-
-### **Azure Components**  
-**Azure Function App** – Powers the scheduled query execution  
-**Blob Storage Service** – Stores the extracted JSON data  
-**Resource Graph** – Queries Big Data from Tenant
-
-### **AWS Components**  
-**CloudWatch Events** – Triggers automated executions  
-**Secrets Manager** – Securely stores Azure credentials  
-**Lambda Functions** – Facilitates data retrieval & transfer  
-**S3 Buckets** – Stores Blob files for easy access  
-
-### **Languages**  
-- **PowerShell**
-- **Python**
-
----
-
-## How It Works  
-
-Blob Questor runs on a **set schedule** to pull data from Azure and transport it securely to AWS:  
-
-1️⃣ **Azure Function App** runs **hourly**, executing a PowerShell script that queries Azure's resources and saves the results in a Blob file.  
-2️⃣ **CloudWatch Events** triggers an AWS Lambda function **twice a day** to initiate data transfer.  
-3️⃣ **Lambda** authenticates with **Secrets Manager** to retrieve the Azure Storage Account Key.  
-4️⃣ Using the retrieved key, **Lambda gains access** to the Azure Blob storage container.  
-5️⃣ **Lambda temporarily stores** the Blob file in **/tmp**, then **uploads it to S3**—securing it for further processing.  
-
-**Why It’s Awesome**  
-✔ **Fully Automated** – No manual intervention needed  
-✔ **Multi-Cloud Ready** – Works across Azure & AWS  
-✔ **Secure & Scalable** – Uses encrypted credentials and cloud-native services  
-
----
-
-## 🚀 Get Started  
-
-**Step 1:** Clone the repo  
-**Step 2:** Configure your Azure & AWS credentials  
-**Step 3:** Deploy the function and schedule your queries  
-**Step 4:** Let Blob Questor do the work!  
-
----
-
-## 📌 Conclusion  
-
-With **Blob Questor**, managing **large-scale Azure data** has never been easier. Say goodbye to **manual queries** and **scattered cloud data**—and hello to **automated insights** at your fingertips!  
-
-**Try it today & simplify your cloud data management!** 
